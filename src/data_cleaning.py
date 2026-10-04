@@ -1,4 +1,9 @@
-"""Clean the raw car dataset and save a model-ready intermediate file."""
+"""Clean raw car data and create a consistent intermediate dataset.
+
+The module can be imported for its reusable cleaning functions or executed as
+a command-line script. The CLI reads ``data/cars.csv`` by default and writes
+``data/cars_cleaned.csv`` without modifying the raw source file.
+"""
 
 from __future__ import annotations
 
@@ -43,20 +48,42 @@ MISSING_VALUE_MARKERS = ["", " ", "NA", "N/A", "nan", "null", "none", "None", "N
 
 
 def standardize_missing_values(data: pd.DataFrame) -> pd.DataFrame:
-	"""Replace common textual missing-value markers without modifying the input."""
+	"""Replace common textual missing-value markers with ``pd.NA``.
+
+	Args:
+		data: Source DataFrame whose values should be normalized.
+
+	Returns:
+		A new DataFrame; the source object is never modified.
+	"""
 	cleaned = data.copy()
 	return cleaned.replace(MISSING_VALUE_MARKERS, pd.NA)
 
 
 def normalize_column_name(column_name: str) -> str:
-	"""Convert a column name to lowercase snake_case."""
+	"""Convert one column name to lowercase ``snake_case``.
+
+	CamelCase boundaries and all non-alphanumeric separators are converted to
+	underscores. Leading and trailing separators are removed.
+	"""
 	normalized = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", column_name.strip())
 	normalized = re.sub(r"[^a-zA-Z0-9]+", "_", normalized)
 	return normalized.strip("_").lower()
 
 
 def clean_car_data(data: pd.DataFrame) -> pd.DataFrame:
-	"""Return a cleaned copy of the raw car data."""
+	"""Validate and clean the complete car dataset.
+
+	Args:
+		data: Raw car records using the expected source columns.
+
+	Returns:
+		A new DataFrame with normalized names and values, imputed missing data,
+		valid numeric ranges, no duplicate rows, and a consecutive index.
+
+	Raises:
+		ValueError: If one or more required columns are missing.
+	"""
 	cleaned = standardize_missing_values(data)
 	cleaned.columns = [normalize_column_name(column) for column in cleaned.columns]
 
@@ -80,7 +107,10 @@ def clean_car_data(data: pd.DataFrame) -> pd.DataFrame:
 			.replace("", pd.NA)
 		)
 
+	# A one-year allowance supports vehicles marketed as the next model year.
 	maximum_year = datetime.now().year + 1
+	# These broad physical limits remove placeholder values while retaining
+	# plausible rare and luxury vehicles that statistical rules may flag.
 	valid_rows = (
 		cleaned["price_usd"].gt(0)
 		& cleaned["year"].between(1886, maximum_year)
@@ -91,6 +121,7 @@ def clean_car_data(data: pd.DataFrame) -> pd.DataFrame:
 	)
 	cleaned = cleaned.loc[valid_rows].copy()
 
+	# Median imputation is resistant to the right-skewed engine-size distribution.
 	cleaned["volume_cm3"] = cleaned["volume_cm3"].fillna(cleaned["volume_cm3"].median())
 	cleaned[TEXT_COLUMNS] = cleaned[TEXT_COLUMNS].fillna("unknown")
 

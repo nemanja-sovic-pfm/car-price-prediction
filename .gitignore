@@ -16,6 +16,7 @@ env/
 
 # Generated data
 data/cars_cleaned.csv
+data/cars_features.csv
 
 # Environment and editor files
 .env
