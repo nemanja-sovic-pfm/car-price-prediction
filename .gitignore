@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment and editor files
+.env
+.env.*
+.vscode/
+.idea/
+
+# Trained model artifacts
+models/*.joblib
+models/*.pkl
+models/*.pickle
+!models/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
