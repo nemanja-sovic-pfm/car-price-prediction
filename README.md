@@ -27,7 +27,8 @@ pretprocesiranje, trening, evaluaciju i poređenje regresionih algoritama.
 - reproduktivna podela na trening i test skup;
 - trening i čuvanje kompletnog Ridge pipeline-a pomoću `joblib`;
 - nezavisna evaluacija sačuvanog modela;
-- poređenje Decision Tree, Random Forest i Gradient Boosting regresora.
+- poređenje Decision Tree, Random Forest i Gradient Boosting regresora;
+- verzionisan tekstualni izveštaj sa rezultatima i njihovim tumačenjem.
 
 ## Skup podataka
 
@@ -54,6 +55,8 @@ car-price-prediction/
 │   └── car_price_model.joblib   # generiše se, Git ignored
 ├── notebooks/
 │   └── 01_eda.ipynb             # izvršena eksplorativna analiza
+├── reports/
+│   └── model_analysis_results.txt # rezultati i analiza modela
 ├── src/
 │   ├── data_cleaning.py
 │   ├── feature_engineering.py
@@ -219,6 +222,10 @@ Decision Tree ima najbolji rezultat među tri poređena modela na ovom test
 splitu. To još nije konačan izbor za produkciju: stabilnost treba potvrditi
 unakrsnom validacijom i podešavanjem hiperparametara.
 
+Detaljan tekstualni izveštaj, uključujući metodologiju, tumačenje metrika,
+rangiranje i ograničenja, nalazi se u
+[reports/model_analysis_results.txt](reports/model_analysis_results.txt).
+
 ## Programski API
 
 Moduli se mogu koristiti i bez CLI-ja:
@@ -248,6 +255,7 @@ X_test_transformed = preprocessor.transform(X_test)
 | `data/cars_cleaned.csv` | `data_cleaning.py` | ne | uvek se može regenerisati |
 | `data/cars_features.csv` | `feature_engineering.py` | ne | uvek se može regenerisati |
 | `models/car_price_model.joblib` | `model_training.py` | ne | sačuvani Ridge pipeline |
+| `reports/model_analysis_results.txt` | evaluacija modela | da | rezultati i njihovo tumačenje |
 
 Modeli iz `model_comparison.py` postoje samo u memoriji tokom izvršavanja i ne
 čuvaju se automatski. Nakon kloniranja repozitorijuma potrebno je pokrenuti

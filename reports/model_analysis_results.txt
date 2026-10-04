@@ -1,0 +1,87 @@
+CAR PRICE PREDICTION - IZVESTAJ O REZULTATIMA MODELA
+====================================================
+
+1. PODACI I NACIN EVALUACIJE
+----------------------------
+
+Izvorni skup: data/cars.csv
+Broj redova nakon ciscenja: 55.842
+Trening skup: 44.673 reda (80%)
+Test skup: 11.169 redova (20%)
+Random state: 42
+Referentna godina za izvedene karakteristike: 2026
+
+Modeli su ocenjeni na izdvojenom test skupu koji nije koriscen za njihovo
+treniranje. Koriscene metrike su:
+
+- MAE: prosecna apsolutna greska u USD; niza vrednost je bolja.
+- RMSE: jace kaznjava velike greske u USD; niza vrednost je bolja.
+- R2: udeo objasnjene varijanse ciljne promenljive; visa vrednost je bolja.
+
+
+2. SACUVANI RIDGE BASELINE
+--------------------------
+
+Model: Ridge
+MAE:  2.009,33 USD
+RMSE: 3.958,93 USD
+R2:   0,7790
+Poboljsanje MAE u odnosu na train-median baseline: 58,9%
+Broj transformisanih karakteristika: 2.155
+Sacuvani artefakt: models/car_price_model.joblib
+
+Tumacenje:
+
+Ridge u proseku odstupa oko 2.009 USD od stvarne cene. RMSE je gotovo dvostruko
+veci od MAE, sto ukazuje na manji broj vozila sa znatno vecim greskama. Model
+objasnjava 77,9% varijanse cena na izdvojenom test skupu.
+
+
+3. POREDJENJE TREE-BASED MODELA
+-------------------------------
+
+Model                       MAE (USD)    RMSE (USD)      R2
+-------------------------  ----------  ------------  ------
+Decision Tree                1.393,29      3.732,14   0,8036
+Random Forest                2.055,54      4.243,53   0,7460
+Gradient Boosting            3.254,34      6.222,27   0,4540
+
+Sva tri modela iz ove tabele koriste isti trening/test split i istu matricu od
+194 transformisane karakteristike. Retke kategorije su grupisane, a broj
+One-Hot kategorija po ulaznoj koloni ogranicen je na 50.
+
+Rangiranje prema sve tri metrike:
+
+1. Decision Tree
+2. Random Forest
+3. Gradient Boosting
+
+Decision Tree ostvaruje najnizi MAE i RMSE, kao i najvisi R2. Zbog toga je
+najbolji model unutar kontrolisanog tree-based poredjenja.
+
+
+4. ZAKLJUCAK
+------------
+
+Decision Tree je pobednik poredjenja tri tree-based algoritma. Njegov rezultat
+je bolji i od Ridge rezultata na istom test splitu, ali ta razlika je
+informativna, a ne potpuno kontrolisano poredjenje: Ridge koristi standardni
+preprocessing sa 2.155 karakteristika, dok tree-based modeli koriste kompaktni
+preprocessing sa 194 karakteristike.
+
+Ridge ostaje jedini trajno sacuvani model u projektu. Modeli iz poredjenja
+postoje samo u memoriji tokom izvrsavanja skripte src/model_comparison.py.
+
+
+5. OGRANICENJA REZULTATA
+------------------------
+
+- Rezultati poticu iz jednog fiksnog holdout splita, bez unakrsne validacije.
+- Hiperparametri nisu sistematski optimizovani.
+- Najbolji comparison model nije sacuvan kao finalni artefakt.
+- Rezultati ne predstavljaju procenu ponasanja modela na novijim ili
+  distribuciono drugacijim podacima.
+
+Pre produkcijskog izbora modela potrebno je sprovesti unakrsnu validaciju,
+podesiti hiperparametre pod istim preprocessing uslovima i zatim sacuvati
+potvrdjeni finalni pipeline.
