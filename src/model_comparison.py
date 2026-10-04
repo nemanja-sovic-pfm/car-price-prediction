@@ -1,7 +1,7 @@
 """Compare tree-based car-price regression algorithms consistently.
 
-Every candidate uses the same train/test split and an independently fitted copy
-of the shared preprocessing pipeline. The holdout metrics therefore compare
+Every candidate uses the same train/test split and the same preprocessing
+matrix fitted only on training data. The holdout metrics therefore compare
 models under identical conditions without leaking test data into training.
 """
 
