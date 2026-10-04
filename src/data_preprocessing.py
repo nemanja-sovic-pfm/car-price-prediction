@@ -73,8 +73,15 @@ def split_features_target(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
 	return features, target
 
 
-def build_preprocessor() -> ColumnTransformer:
+def build_preprocessor(
+	max_categories: int | None = None,
+	min_frequency: int | float | None = None,
+) -> ColumnTransformer:
 	"""Create an unfitted transformer for numeric and categorical features.
+
+	Args:
+		max_categories: Optional maximum encoded categories per source column.
+		min_frequency: Optional threshold for grouping infrequent categories.
 
 	Returns:
 		A ``ColumnTransformer`` ready to be included in a model pipeline.
@@ -90,7 +97,12 @@ def build_preprocessor() -> ColumnTransformer:
 			("imputer", SimpleImputer(strategy="most_frequent")),
 			(
 				"encoder",
-				OneHotEncoder(handle_unknown="ignore", sparse_output=True),
+				OneHotEncoder(
+					handle_unknown="ignore",
+					sparse_output=True,
+					max_categories=max_categories,
+					min_frequency=min_frequency,
+				),
 			),
 		]
 	)
